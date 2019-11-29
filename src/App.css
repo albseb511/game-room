@@ -1,22 +1,23 @@
-.App {
+*{
+  padding:10px;
+  margin:10px;
+}
+form{
   text-align: center;
+  margin-top: 100px;
+}
+input{
+  width:200px;
 }
 
-.App-logo {
-  height: 40vmin;
+#room{
+  display:flex;
+  width: 1000px;
+  justify-content: space-around;
+  border: 1px solid black;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #09d3ac;
+#chat > div{
+  flex: 1;
+  margin-right:300px;
 }
