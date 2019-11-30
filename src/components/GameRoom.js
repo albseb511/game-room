@@ -1,19 +1,19 @@
 import React, { Component } from "react";
 import axios from "axios";
 import GameCard from "./GameCard";
+import io from "socket.io-client";
 
 export default class GameRoom extends Component {
   constructor(props) {
     super(props);
+    this.url = "localhost:8000";
+    this.socket = io(this.url);
     this.state = {
       data: [],
-      question: "",
-      options: [],
-      answer: "",
       counter: 0,
       loading: true,
-      timeUp: () => setInterval(() => {}, 5000),
-      totalCorrect: 0
+      leaderBoard: {},
+      gameOver: false:
     };
   }
   componentDidMount() {
@@ -25,17 +25,38 @@ export default class GameRoom extends Component {
           loading: false
         });
       })
-      .then(() => this.state.timeUp());
+      .then(() => {
+        console.log("sending start timer to server");
+        this.socket.emit("start timer", {});
+      });
+    this.socket.on("broadcast", data => {
+      switch (data.type) {
+        case "leaderBoard":
+          this.setState({ leaderBoard: data.leaderBoard });
+          break;
+        case "currentWinner":
+          this.setState({ counter: this.state.counter + 1 });
+          this.socket.emit("start timer", {});
+          break;
+        default:
+          break;
+      }
+    });
   }
 
   handleRadio(e) {
-    if (e === this.state.data[this.state.counter].answer) {
-      this.setState({ totalCorrect: this.state.totalCorrect + 1 });
-    }
-    console.log(this.state);
-    this.setState({ counter: this.state.counter + 1 });
+    let uid = this.props.userId;
+    let qno = this.state.counter;
+    let answer = e === this.state.data[this.state.counter].answer;
+    this.socket.connect();
+    this.socket.emit("responseToServer", { uid: uid, qno: qno, ans: answer });
+  }
+
+  handleGameOver() {
+    this.socket.emit("handleGameOver");
   }
   render() {
+
     return (
       <React.Fragment>
         {this.state.loading ? (
@@ -43,10 +64,16 @@ export default class GameRoom extends Component {
         ) : this.state.counter < this.state.data.length ? (
           <GameCard
             question={this.state.data[this.state.counter]}
+            pos={this.state.counter}
             changeFunction={e => this.handleRadio(e)}
           />
         ) : (
-          <div>Game Over</div>
+          <div
+            style={{ fontSize: "50px", textAlign: "center", margin: "auto" }}
+          >
+            {this.handleGameOver()}
+            Game Over
+          </div>
         )}
       </React.Fragment>
     );

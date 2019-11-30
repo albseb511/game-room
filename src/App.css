@@ -1,117 +1,128 @@
-*{
-  padding:10px;
+* {
+  padding: 10px;
   /* margin:10px; */
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
-body{
+body {
   background: #c8d6e5;
 }
-form{
+form {
   text-align: center;
-
 }
-input{
-  width:200px;
+input {
+  width: 200px;
   border-radius: 5px;
 }
 
-#room{
-  display:flex;
+#room {
+  display: flex;
   /* border: 1px solid black; */
   justify-content: stretch;
   height: 500px;
   overflow: hidden;
 }
 
-
-#room > *:first-child{
+#room > *:first-child {
   border-top-left-radius: 15px;
   border-bottom-left-radius: 15px;
-  flex:1;
-  background: #B33771;
-  color:white
+  flex: 1;
+  background: #b33771;
+  color: white;
 }
-#room > *:nth-child(2){
-  flex:3;
+#room > *:nth-child(2) {
+  flex: 3;
   background: #f5f6fa;
-  color:black
+  color: black;
 }
-#room > *:nth-child(3){
+#room > *:nth-child(3) {
   flex: 1;
   background: #f5f6fa;
-  color:black;
+  color: black;
   border-top-right-radius: 15px;
   border-bottom-right-radius: 15px;
 }
 
-#chat > div{
+#chat > div {
   flex: 1;
-  margin-right:300px;
+  margin-right: 300px;
 }
 
-#login-box{
+#login-box {
   /* border:2px solid #ecf0f1; */
   width: 300px;
   margin: auto;
   border-radius: 10px;
   margin-top: 100px;
   background: #8e44ad;
-  color:white;
+  color: white;
   padding: 45px 25px;
   /* margin: 50px; */
 }
 
-form> *{
+form > * {
   margin: 20px 20px;
 }
 
 .osxbutton {
   text-decoration: none;
-  font-family:".LucidaGrandeUI", "Lucida Grande", "Lucida sans unicode";
+  font-family: ".LucidaGrandeUI", "Lucida Grande", "Lucida sans unicode";
   color: black;
   font-size: 11px;
   padding: 10px 17px;
-  border:1px solid #9C9C9C;
+  border: 1px solid #9c9c9c;
   margin: 2px 2px;
   display: inline-block;
   background-image: -webkit-linear-gradient(
-  #ffffff 0%, #F6F6F6 	30%, 
-  #F3F3F3 45%, #EDEDED 	60%, 
-  #eeeeee 100%);
+    #ffffff 0%,
+    #f6f6f6 30%,
+    #f3f3f3 45%,
+    #ededed 60%,
+    #eeeeee 100%
+  );
   border-radius: 3px;
   cursor: default;
-  box-shadow: 0px 0px 1px rgba(0,0,0,0.20);
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
 }
 
 .osxbutton:active {
-  border-color:#705ebb;
- background-image:-webkit-linear-gradient(
- #acc5e9 0%, 		#a3c0f2 18%, 
- #61a0ed 39%,		#55a3f2 70%, 
- #82c2f1 91.72%, 	#9AD2F2 100%); 
- box-shadow: 0px 0px 1px rgba(0,0,0,0.65);		
+  border-color: #705ebb;
+  background-image: -webkit-linear-gradient(
+    #acc5e9 0%,
+    #a3c0f2 18%,
+    #61a0ed 39%,
+    #55a3f2 70%,
+    #82c2f1 91.72%,
+    #9ad2f2 100%
+  );
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.65);
 }
 .osxbutton.disabled {
- color: #999!important;
- background-image: -webkit-linear-gradient(#fbf8f8 0%, #f0f0f0 30%, #e3e3e3 45%, #d7d7d7 60%, #cbc9c9 100%);
+  color: #999 !important;
+  background-image: -webkit-linear-gradient(
+    #fbf8f8 0%,
+    #f0f0f0 30%,
+    #e3e3e3 45%,
+    #d7d7d7 60%,
+    #cbc9c9 100%
+  );
 }
 
-#notify{
+#notify {
   border-radius: 15px;
-  width:200px;
+  width: 200px;
   background: #f5f6fa;
   margin-left: 15px;
 }
 
-#msg-input{
-  margin-top:150px;
+#msg-input {
+  margin-top: 150px;
 }
 
-#msg-input > input{
+#msg-input > input {
   width: 400px;
 }
 
-.round{
+.round {
   background: green;
   width: 1px;
   height: 1px;
@@ -119,11 +130,11 @@ form> *{
   margin-right: 10px;
 }
 
-.msgbox{
+.msgbox {
   overflow: scroll;
   height: 200px;
 }
 
-.user-list{
+.user-list {
   display: flex;
 }
