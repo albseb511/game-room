@@ -13,7 +13,7 @@ export default class GameRoom extends Component {
       counter: 0,
       loading: true,
       leaderBoard: {},
-      gameOver: false:
+      gameOver: false
     };
   }
   componentDidMount() {
@@ -52,11 +52,19 @@ export default class GameRoom extends Component {
     this.socket.emit("responseToServer", { uid: uid, qno: qno, ans: answer });
   }
 
-  handleGameOver() {
+  handleGameOver = () => {
     this.socket.emit("handleGameOver");
+  };
+  componentWillMount() {
+    this.socket.close();
   }
   render() {
-
+    if (this.state.counter >= this.state.data.length) {
+      if (this.state.gameOver === false) {
+        this.setState({ gameOver: true });
+        this.handleGameOver();
+      }
+    }
     return (
       <React.Fragment>
         {this.state.loading ? (
@@ -71,7 +79,6 @@ export default class GameRoom extends Component {
           <div
             style={{ fontSize: "50px", textAlign: "center", margin: "auto" }}
           >
-            {this.handleGameOver()}
             Game Over
           </div>
         )}

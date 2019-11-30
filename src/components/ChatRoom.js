@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import GameRoom from "./GameRoom";
 import io from "socket.io-client";
-const socket = io("http://localhost:8000");
+const socket = io("ws://localhost:8000");
 socket.connect();
 
 class ChatRoom extends React.Component {
@@ -9,17 +9,22 @@ class ChatRoom extends React.Component {
     super(props);
     this.state = {
       users: [],
-      gameRoom: ["crap weasel"],
+      gameRoom: [""],
       joinStatus: false,
       messageVal: "",
       message: "",
       allMessages: [],
       timer: "",
       gameStart: false,
-      url: "http://localhost:8000"
+      url: "http://localhost:8000",
+      roomName: "",
+      rooms: {},
+      channels: ["home", "spartans", "vikings", "samurai", "general", "random"],
+      activeChannel: "/"
     };
   }
   sendMessage = () => {
+    console.log("adding new message", this.state.messageVal, this.props.name);
     socket.emit("add message", {
       message: this.state.messageVal,
       name: this.props.name
@@ -33,26 +38,42 @@ class ChatRoom extends React.Component {
     } else {
       socket.emit("removePlayer", this.state.name);
     }
-    this.setState({ joinStatus: !this.state.joinStatus });
   };
-
+  addRooms = () => {
+    // var temp = {...this.state.rooms, this.state.roomName:'sdafsd'}
+    // this.setState({rooms:temp})
+  };
+  componentWillUnmount() {
+    socket.close();
+  }
+  updateActiveChannel = val => {
+    if (val == "home") val = "/";
+    socket.emit("change", { location: val, name: this.props.name });
+  };
   componentDidMount() {
     socket.emit("add user", this.props.name);
 
     socket.on("broadcast", data => {
+      console.log(data);
       switch (data.type) {
         case "newUser":
+          console.log("new user added");
           this.setState({ users: data.users });
           break;
         case "newMessage":
+          console.log("new message from server");
           this.setState({ allMessages: [...this.state.allMessages, data] });
           break;
         case "gameRoomUpdate":
+          console.log("new game room added");
           this.setState({ gameRoom: data.game });
           break;
         case "timer":
+          console.log("timer updating", data);
           this.setState({ timer: data.timer });
           break;
+        default:
+          console.log(data);
       }
     });
   }
@@ -71,6 +92,24 @@ class ChatRoom extends React.Component {
                   <div class="user-list" key={a}>
                     <div class="round"></div>
                     {a}
+                  </div>
+                ))
+              ) : (
+                <div>No users online</div>
+              )}
+            </div>
+            <div>CHANNELS</div>
+            <div>
+              {this.state.channels.length !== 0 ? (
+                this.state.channels.map((a, i) => (
+                  <div
+                    class="user-list"
+                    onClick={() => {
+                      this.updateActiveChannel(a);
+                    }}
+                    key={a}
+                  >
+                    #{a}
                   </div>
                 ))
               ) : (
@@ -105,14 +144,19 @@ class ChatRoom extends React.Component {
             <div
               style={{ display: "flex", justifyContent: "space-around" }}
             ></div>
-            <div>GAME ROOM</div>
+            <div>ROOMS</div>
             <br />
             {this.state.joinStatus ? "..." + this.state.timer : null}
 
             <div>
-              {/* {this.state.joinStatus
-                ? this.state.gameRoom.map(a => <div key={a}>{a}</div>)
-                : null} */}
+              {/* {Object.keys(this.state.rooms).map(a=><div>{a}</div>)}
+                            <input value={this.state.roomName} onChange={(e)=>this.setState({
+                                roomName:e.target.value
+                            })}></input>
+                            <br/>
+                            <br/>
+                            <button onClick={()=>this.addRooms()}>ADD</button> */}
+              {/* {this.state.joinStatus?this.state.gameRoom.users.map(a=><div key={a}>{a}</div>):null} */}
               {!this.state.joinStatus ? (
                 <button class="osxbutton" onClick={() => this.toggleStatus()}>
                   'JOIN GAME'
