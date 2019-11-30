@@ -13,10 +13,11 @@ const App = () => {
   }
   return id!==""?
   <>
-    <div>Hello {id}</div>
+    <div id='notify'>Hello {id}</div>
     <ChatRoom name={id}/>
   </>:
-  <div>
+  <div id='login-box'>
+    <div id='top-bar'></div>
     <form onSubmit={e=>handleSubmit(e)}>
       <label>Create username</label>
       <br/>
@@ -26,7 +27,7 @@ const App = () => {
         required
         placeholder="please enter your username"/>
         <br/>
-        <button type="submit">
+        <button class='osxbutton' type="submit">
           JOIN ROOM
         </button>
       <br/>

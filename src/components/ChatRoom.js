@@ -1,135 +1,119 @@
 import React,{useState,useEffect} from 'react'
-import useSocket from 'use-socket.io-client';
+import io from 'socket.io-client'
+const socket = io("http://localhost:8000");
+socket.connect();
 
-const ChatRoom = ({name}) => {
-    const [users, setUsers] = useState([])
-    const [gameRoom, setGameRoom] = useState(['game#123'])
-    const [joinStatus, setJoinStatus] = useState(false)
-    const [messageVal, setMessageVal]  = useState('')
-    const [message, setMessage] = useState('')
-    const [allMessages,setAllMessages] = useState([])
-    const [timer, setTimer] = useState('')
-    const [gameStart,setGameStart] = useState(false)
-    
-
-    console.log(allMessages)
-    const url = 'localhost:8000'
-    const [socket] = useSocket(url);
-    console.log(users)
-    socket.connect();
-    useEffect(() => {
-        console.log('adding user')
-        socket.emit('add user',name)
-      }, name);
-    useEffect(()=>{
-        if(timer==='GAME STARTING')
-            setGameStart(true)
-
-    },[timer])
-      useEffect(()=>{
-          console.log('adding new message',message,name)
-          socket.emit('add message',{message,name})
-          setMessageVal('')
-      },[message])
-         
-      const toggleStatus = () =>{
-          console.log('updating join status')
-        if(joinStatus==false){
-            setJoinStatus(true)
-            socket.emit('addPlayer',name)
+class ChatRoom extends React.Component{
+    constructor(props){
+        super(props)
+        this.state={
+            users:[],
+            gameRoom:[],
+            joinStatus:false,
+            messageVal:'',
+            message:'',
+            allMessages:[],
+            timer:'',
+            gameStart:false,
+            url:'http://localhost:8000'
         }
-        else{
-            setJoinStatus(false)
-            socket.emit('removePlayer',name)
-        }
+    }
+    sendMessage =()=>{
+        console.log('adding new message',this.state.messageVal,this.props.name)
+        socket.emit('add message',{message:this.state.messageVal,name:this.props.name})
+        this.setState({messageVal:''})
+    }
+
+    toggleStatus = () =>{
+        console.log('updating join status')
+      if(this.state.joinStatus==false){
+          socket.emit('addPlayer',this.state.name)
       }
-      
+      else{
+          socket.emit('removePlayer',this.state.name)
+      }
+      this.setState({joinStatus:!this.state.joinStatus})
+    }
 
-    socket.on('broadcast', data=>{
-        console.log(data)
-        switch(data.type){
-            case 'newUser':
-                    console.log('new user added')
-                    setUsers(data.users)
-                    setGameRoom(data.game)
-                    break
-            case 'newMessage':
-                    console.log('new message from server')
-                    setAllMessages([...allMessages,data])
-                    break
-            case 'gameRoomUpdate':
-                    console.log('new game room added')
-                    setGameRoom(data.game)
-                    break
-            case 'timer':
-                    console.log('timer updating',data)
-                    setTimer(data.timer)
-                    break
-        }
-        
-    })
+    componentDidMount(){
+        socket.emit('add user',this.props.name)
 
-
-    socket.on('kickout',data=>{
-        if(data===name)
-            name=null
-    })
-    console.log(socket);
-    console.log('timer is',timer)
-    if(gameStart)
-        return(<div>GAME IS STARTING</div>)
-    else
-    return(
-            <div id='room'>
-                {/* USERS */}
-                <div>
+        socket.on('broadcast', data=>{
+            console.log(data)
+            switch(data.type){
+                case 'newUser':
+                        console.log('new user added')
+                        this.setState({users:data.users})
+                        break
+                case 'newMessage':
+                        console.log('new message from server')
+                        this.setState({allMessages:[...this.state.allMessages,data]})
+                        break
+                case 'gameRoomUpdate':
+                        console.log('new game room added')
+                        this.setState({gameRoom:data.game})
+                        break
+                case 'timer':
+                        console.log('timer updating',data)
+                        this.setState({timer:data.timer})
+                        break
+            }
+            
+        })
+    }
+    render(){
+            if(this.state.gameStart)
+            return(<div>GAME IS STARTING</div>)
+        else
+        return(
+                <div id='room'>
+                    {/* USERS */}
                     <div>
-                        USERS
+                        <div>
+                            USERS
+                        </div>
+                        <div>
+                            {this.state.users.length!==0?
+                                this.state.users.map(a=><div class='user-list' key={a}><div class='round'></div>{a}</div>):
+                                <div>No users online</div>}
+                        </div>
                     </div>
+                    {/* CHAT ROOM */}
+                    <div class='messageBox' >
+                        <div>
+                            CHAT ROOM
+                        </div>
+                        <div class='msgbox'>
+                            {this.state.allMessages.map((a,i)=>{
+                                return(<div key={i}>{`${a.name}: ${a.message}`}</div>)
+                            })}
+                        </div>
+                        <div id='msg-input'>
+                            <input onChange={(e)=>this.setState({messageVal:e.target.value.trim()})} 
+                                    id='message' 
+                                    placeholder='say something'
+                                    value={this.state.messageVal}/>
+                            <button class='osxbutton' onClick={()=>this.sendMessage()} >Send</button>
+                        </div>
+                    </div>
+                    {/* GAME ROOM */}
                     <div>
-                        {users.length!==0?
-                            users.map(a=><div class='user-list' key={a}>{a}</div>):
-                            <div>No users online</div>}
+                        <div style={{display:'flex',justifyContent:'space-around'}}></div>
+                            <div>GAME ROOM</div>
+                            <br/>
+                            {this.state.joinStatus?"..."+this.state.timer:null}
+                            
+                        <div>
+                            
+                             {this.state.joinStatus?this.state.gameRoom.users.map(a=><div key={a}>{a}</div>):null}
+                             {!this.state.joinStatus?<button class='osxbutton' onClick={()=>this.toggleStatus()}>'JOIN GAME'</button>:
+                             <button class='osxbutton' onClick={()=>this.toggleStatus()}>'EXIT GAME'</button>}
+                             
+                        </div>
                     </div>
                 </div>
-                {/* CHAT ROOM */}
-                <div class='messageBox' >
-                    <div>
-                        CHAT ROOM
-                    </div>
-                    <div style={{
-                                overflow:'scroll',
-                                height:150
-                                }}>
-                        {allMessages.map((a,i)=>{
-                            return(<div key={i}>{`${a.name}: ${a.message}`}</div>)
-                        })}
-                    </div>
-                    <div>
-                        <input onChange={(e)=>setMessageVal(e.target.value.trim())} 
-                                id='message' 
-                                placeholder='say something'
-                                value={messageVal}/>
-                        <button onClick={()=>setMessage(messageVal)} >Send</button>
-                    </div>
-                </div>
-                {/* GAME ROOM */}
-                <div>
-                    <div style={{display:'flex',justifyContent:'space-around'}}></div>
-                        <div>GAME ROOM</div>
-                        <br/>
-                        {joinStatus?"..."+timer:null}
-                        
-                    <div>
-                        
-                         {joinStatus?gameRoom.users.map(a=><div key={a}>{a}</div>):null}
-                         {!joinStatus?<button onClick={()=>toggleStatus()}>'JOIN GAME'</button>:
-                         <button onClick={()=>toggleStatus()}>'EXIT GAME'</button>}
-                         
-                    </div>
-                </div>
-            </div>
-    )
+        )
+    }
 }
 
 export {ChatRoom}
