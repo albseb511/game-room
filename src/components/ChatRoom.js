@@ -1,6 +1,6 @@
 import React,{useState,useEffect} from 'react'
 import io from 'socket.io-client'
-const socket = io("http://localhost:8000");
+const socket = io("ws://localhost:8000");
 socket.connect();
 
 class ChatRoom extends React.Component{
@@ -8,14 +8,18 @@ class ChatRoom extends React.Component{
         super(props)
         this.state={
             users:[],
-            gameRoom:[],
+            gameRoom:[''],
             joinStatus:false,
             messageVal:'',
             message:'',
             allMessages:[],
             timer:'',
             gameStart:false,
-            url:'http://localhost:8000'
+            url:'http://localhost:8000',
+            roomName:'',
+            rooms:{},
+            channels:['home','spartans','vikings','samurai','general','random'],
+            activeChannel:'/'
         }
     }
     sendMessage =()=>{
@@ -34,7 +38,18 @@ class ChatRoom extends React.Component{
       }
       this.setState({joinStatus:!this.state.joinStatus})
     }
-
+    addRooms =() =>{
+        // var temp = {...this.state.rooms, this.state.roomName:'sdafsd'}
+        // this.setState({rooms:temp})
+    }
+    componentWillUnmount(){
+        socket.close()
+    }
+    updateActiveChannel=(val)=>{
+        if(val=='home')
+            val ='/'
+        socket.emit('change',{location:val,name:this.props.name})
+    }
     componentDidMount(){
         socket.emit('add user',this.props.name)
 
@@ -57,12 +72,14 @@ class ChatRoom extends React.Component{
                         console.log('timer updating',data)
                         this.setState({timer:data.timer})
                         break
+                default:
+                    console.log(data)
             }
             
         })
     }
     render(){
-            if(this.state.gameStart)
+            if(this.state.timer=='GAME STARTING')
             return(<div>GAME IS STARTING</div>)
         else
         return(
@@ -75,6 +92,14 @@ class ChatRoom extends React.Component{
                         <div>
                             {this.state.users.length!==0?
                                 this.state.users.map(a=><div class='user-list' key={a}><div class='round'></div>{a}</div>):
+                                <div>No users online</div>}
+                        </div>
+                        <div>
+                            CHANNELS
+                        </div>
+                        <div>
+                            {this.state.channels.length!==0?
+                                this.state.channels.map((a,i)=><div class='user-list' onClick={()=>{this.updateActiveChannel(a)}}  key={a}>#{a}</div>):
                                 <div>No users online</div>}
                         </div>
                     </div>
@@ -99,13 +124,19 @@ class ChatRoom extends React.Component{
                     {/* GAME ROOM */}
                     <div>
                         <div style={{display:'flex',justifyContent:'space-around'}}></div>
-                            <div>GAME ROOM</div>
+                            <div>ROOMS</div>
                             <br/>
                             {this.state.joinStatus?"..."+this.state.timer:null}
                             
                         <div>
-                            
-                             {this.state.joinStatus?this.state.gameRoom.users.map(a=><div key={a}>{a}</div>):null}
+                            {/* {Object.keys(this.state.rooms).map(a=><div>{a}</div>)}
+                            <input value={this.state.roomName} onChange={(e)=>this.setState({
+                                roomName:e.target.value
+                            })}></input>
+                            <br/>
+                            <br/>
+                            <button onClick={()=>this.addRooms()}>ADD</button> */}
+                             {/* {this.state.joinStatus?this.state.gameRoom.users.map(a=><div key={a}>{a}</div>):null} */}
                              {!this.state.joinStatus?<button class='osxbutton' onClick={()=>this.toggleStatus()}>'JOIN GAME'</button>:
                              <button class='osxbutton' onClick={()=>this.toggleStatus()}>'EXIT GAME'</button>}
                              

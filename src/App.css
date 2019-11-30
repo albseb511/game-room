@@ -127,3 +127,13 @@ form> *{
 .user-list{
   display: flex;
 }
+
+.user-list:hover{
+  opacity: 0.8;
+  background: #8e44ad;
+  cursor: pointer;
+}
+
+.user-list:active{
+  background: #8e44ad; 
+}
