@@ -14,7 +14,7 @@ const App = () => {
   return id!==""?
   <>
     <div>Hello {id}</div>
-    <ChatRoom/>
+    <ChatRoom name={id}/>
   </>:
   <div>
     <form onSubmit={e=>handleSubmit(e)}>
