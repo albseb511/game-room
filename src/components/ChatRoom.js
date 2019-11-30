@@ -3,11 +3,13 @@ import useSocket from 'use-socket.io-client';
 
 const ChatRoom = ({name}) => {
     const [users, setUsers] = useState([])
-    const [userGameRoom, setUserGameRoom] = useState(false)
-    const [gameRooms, setGameRooms] = useState([])
+    const [gameRoom, setGameRoom] = useState(['game#123'])
+    const [joinStatus, setJoinStatus] = useState(false)
     const [messageVal, setMessageVal]  = useState('')
     const [message, setMessage] = useState('')
     const [allMessages,setAllMessages] = useState([])
+    const [timer, setTimer] = useState('')
+    const [gameStart,setGameStart] = useState(false)
     
 
     console.log(allMessages)
@@ -16,21 +18,40 @@ const ChatRoom = ({name}) => {
     console.log(users)
     socket.connect();
     useEffect(() => {
+        console.log('adding user')
         socket.emit('add user',name)
-      }, [socket]);
-    
+      }, name);
+    useEffect(()=>{
+        if(timer==='GAME STARTING')
+            setGameStart(true)
+
+    },[timer])
       useEffect(()=>{
           console.log('adding new message',message,name)
           socket.emit('add message',{message,name})
           setMessageVal('')
       },[message])
          
+      const toggleStatus = () =>{
+          console.log('updating join status')
+        if(joinStatus==false){
+            setJoinStatus(true)
+            socket.emit('addPlayer',name)
+        }
+        else{
+            setJoinStatus(false)
+            socket.emit('removePlayer',name)
+        }
+      }
+      
+
     socket.on('broadcast', data=>{
         console.log(data)
         switch(data.type){
             case 'newUser':
                     console.log('new user added')
                     setUsers(data.users)
+                    setGameRoom(data.game)
                     break
             case 'newMessage':
                     console.log('new message from server')
@@ -38,17 +59,26 @@ const ChatRoom = ({name}) => {
                     break
             case 'gameRoomUpdate':
                     console.log('new game room added')
-                    setGameRooms(data.game)
+                    setGameRoom(data.game)
+                    break
+            case 'timer':
+                    console.log('timer updating',data)
+                    setTimer(data.timer)
+                    break
         }
         
     })
+
 
     socket.on('kickout',data=>{
         if(data===name)
             name=null
     })
     console.log(socket);
-    
+    console.log('timer is',timer)
+    if(gameStart)
+        return(<div>GAME IS STARTING</div>)
+    else
     return(
             <div id='room'>
                 {/* USERS */}
@@ -85,15 +115,17 @@ const ChatRoom = ({name}) => {
                 </div>
                 {/* GAME ROOM */}
                 <div>
+                    <div style={{display:'flex',justifyContent:'space-around'}}></div>
+                        <div>GAME ROOM</div>
+                        <br/>
+                        {joinStatus?"..."+timer:null}
+                        
                     <div>
-                        GAME ROOM
-                    </div>
-                    <div>
-                         {gameRooms.length!==0?
-                            gameRooms.map(a=><div class='g-room' key={a}>
-                                {a} <button onClick={()=>{}}>JOIN</button>
-                                </div>):
-                            <div>No users online</div>}
+                        
+                         {joinStatus?gameRoom.users.map(a=><div key={a}>{a}</div>):null}
+                         {!joinStatus?<button onClick={()=>toggleStatus()}>'JOIN GAME'</button>:
+                         <button onClick={()=>toggleStatus()}>'EXIT GAME'</button>}
+                         
                     </div>
                 </div>
             </div>
