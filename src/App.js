@@ -16,7 +16,7 @@ const App = () => {
       <ChatRoom name={id} />
     </>
   ) : (
-    <div id="login-box">
+    <div class='shadow' id="login-box">
       <div id="top-bar"></div>
       <form onSubmit={e => handleSubmit(e)}>
         <label>Create username</label>

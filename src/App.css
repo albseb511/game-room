@@ -59,8 +59,15 @@ input {
   /* margin: 50px; */
 }
 
+
+
+.shadow {
+  box-shadow: 0 8px 6px -6px black;
+}
+
 form > * {
   margin: 20px 20px;
+  padding-left: 30px;
 }
 
 .osxbutton {
@@ -147,4 +154,46 @@ form > * {
 
 .user-list:active{
   background: #8e44ad; 
+}
+
+#quest{
+  width: 50%;
+  background: #ecf0f1;
+  margin:20px;
+  border-radius: 15px;
+  
+}
+
+#quest >div:last-child{
+  width: 100%;
+  font-weight: bold;
+}
+
+#quest >div:last-child > div{
+  margin:20px;
+}
+
+
+#quest >div:last-child > div:hover{
+  color: black;
+  background: #2ecc71; 
+}
+
+.r-15{
+  border-radius: 15px;
+}
+
+.blue{
+  color: black;
+  background: #2980b9;
+}
+
+
+.purple{
+  color: white;
+  background: #8e44ad;
+}
+
+.ans{
+  width:200px
 }

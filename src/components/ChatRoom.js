@@ -23,6 +23,9 @@ class ChatRoom extends React.Component {
       activeChannel: "/"
     };
   }
+  resetGame = () =>{
+      this.setState({timer:'',joinStatus:false})
+  }
   sendMessage = () => {
     console.log("adding new message", this.state.messageVal, this.props.name);
     socket.emit("add message", {
@@ -38,6 +41,7 @@ class ChatRoom extends React.Component {
     } else {
       socket.emit("removePlayer", this.state.name);
     }
+    this.setState({joinStatus:!this.state.joinStatus})
   };
   addRooms = () => {
     // var temp = {...this.state.rooms, this.state.roomName:'sdafsd'}
@@ -79,7 +83,7 @@ class ChatRoom extends React.Component {
   }
   render() {
     if (this.state.timer === "GAME STARTING")
-      return <GameRoom userId={this.props.name} />;
+      return <GameRoom userId={this.props.name} reset={this.resetGame} />;
     else
       return (
         <div id="room">
@@ -119,7 +123,7 @@ class ChatRoom extends React.Component {
           </div>
           {/* CHAT ROOM */}
           <div class="messageBox">
-            <div>CHAT ROOM</div>
+              <div>CHAT ROOM:  <span style={{fontSize:8}}>{ this.state.activeChannel=='/'?'home':this.state.activeChannel}</span></div>
             <div class="msgbox">
               {this.state.allMessages.map((a, i) => {
                 return <div key={i}>{`${a.name}: ${a.message}`}</div>;
